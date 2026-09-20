@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.arp.dev/resource.schema.json",
+  "title": "ARP Resource (v1.1)",
+  "type": "object",
+  "required": ["arp", "id", "types", "properties", "relationships", "actions", "metadata"],
+  "additionalProperties": true,
+  "properties": {
+    "arp": {
+      "type": "string",
+      "const": "1.1"
+    },
+    "id": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "types": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "intent": {
+      "type": "array",
+      "description": "High-level goals or purposes an agent can accomplish on this resource.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "state": {
+      "type": "object",
+      "description": "Current state variables for the resource (e.g. cart_items, selected_product).",
+      "additionalProperties": true
+    },
+    "memory_key": {
+      "type": "string",
+      "description": "Stable anchor allowing agents to reference previously seen objects without re-parsing."
+    },
+    "events": {
+      "type": "array",
+      "description": "Stream of events that may occur on this resource (e.g. price_changed).",
+      "items": {
+        "type": "string"
+      }
+    },
+    "media": {
+      "type": "array",
+      "description": "Semantic descriptions of multimedia assets associated with this resource.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "MIME type of the asset (e.g. image/jpeg, video/mp4, audio/mpeg). Use standard IANA MIME types."
+          },
+          "url": { "type": "string", "format": "uri" },
+          "caption": { "type": "string", "description": "Human-readable description for agents that lack vision models." },
+          "alt_text": { "type": "string", "description": "Short accessible label for the asset." }
+        }
+      }
+    },
+    "agents": {
+      "type": "array",
+      "description": "Agent-to-agent references exposing external agent services or support endpoints.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "properties": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relationship"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "$ref": "action.schema.json"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "validUntil": { "type": "string", "format": "date-time" },
+        "language": { "type": "string" },
+        "contentHash": { "type": "string" },
+        "sensitivity": { "type": "string", "enum": ["public", "low", "medium", "high", "critical"] },
+        "retention": { "type": "string" },
+        "auditRequired": { "type": "boolean" },
+        "signature": {
+          "type": "object",
+          "required": ["alg", "keyId", "signedPayload", "value"],
+          "additionalProperties": false,
+          "properties": {
+            "alg": { "type": "string", "enum": ["Ed25519"] },
+            "keyId": { "type": "string", "format": "uri" },
+            "signedPayload": { "type": "string" },
+            "value": { "type": "string" }
+          }
+        },
+        "source": {
+          "type": "object",
+          "description": "Provenance tracking for data origins.",
+          "additionalProperties": true
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "relationship": {
+      "type": "object",
+      "required": ["type", "target"],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "cardinality": {
+          "type": "string",
+          "enum": ["one", "many", "unknown"]
+        },
+        "traversal": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

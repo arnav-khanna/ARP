@@ -1,0 +1,80 @@
+{
+  "arp": "1.1",
+  "id": "arp:shop.example:product:123",
+  "url": "https://shop.example/products/rain-jacket-blue",
+  "types": [
+    "ecommerce/product/v1"
+  ],
+  "properties": {
+    "name": "Astra Rain Jacket",
+    "brand": "AstraGear",
+    "price": {
+      "amount": 89.99,
+      "currency": "USD"
+    },
+    "availability": "in-stock"
+  },
+  "relationships": [
+    {
+      "type": "hasVariant",
+      "target": "https://shop.example/products/rain-jacket/variants/blue-m.agent.json"
+    }
+  ],
+  "actions": [
+    {
+      "id": "cart.addItem",
+      "safe": false,
+      "reversible": true,
+      "safetyClass": [
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://shop.example/arp/actions/cart.addItem"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "variantId",
+          "quantity"
+        ],
+        "properties": {
+          "variantId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "outputs": {
+        "type": "object"
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "cart.write"
+        ]
+      },
+      "requiresHumanConfirmation": false,
+      "sideEffects": [
+        "cart.modified"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-06-28T09:00:00Z",
+    "validUntil": "2026-06-28T09:15:00Z"
+  },
+  "intent": [
+    "general_interaction"
+  ],
+  "state": {
+    "session_active": true
+  }
+}

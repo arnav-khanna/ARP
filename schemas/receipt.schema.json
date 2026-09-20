@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.arp.dev/receipt.schema.json",
+  "title": "ARP Receipt",
+  "description": "Schema for ARP action receipt — cryptographically verifiable proof of action execution.",
+  "type": "object",
+  "required": ["receipt"],
+  "additionalProperties": true,
+  "properties": {
+    "receipt": {
+      "$ref": "#/$defs/receipt"
+    }
+  },
+  "$defs": {
+    "receipt": {
+      "type": "object",
+      "required": ["id", "version", "action", "resource", "origin", "executedAt", "nonce", "status"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable, globally unique receipt identifier"
+        },
+        "version": {
+          "type": "string",
+          "description": "ARP receipt schema version",
+          "enum": ["1.0"]
+        },
+        "action": {
+          "type": "string",
+          "description": "Action identifier that was executed"
+        },
+        "resource": {
+          "type": "string",
+          "description": "ARP resource identifier the action was executed on"
+        },
+        "origin": {
+          "type": "string",
+          "format": "uri",
+          "description": "Origin that issued this receipt"
+        },
+        "executedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of action execution"
+        },
+        "requestHash": {
+          "type": "string",
+          "description": "SHA-256 base64url hash of the request body — binds receipt to specific input"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 12,
+          "description": "Random string for replay attack prevention. Agents MUST track seen nonces."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["succeeded", "failed", "queued", "partial"],
+          "description": "Outcome of action execution"
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Echo of the inputs used (SHOULD omit sensitive fields)"
+        },
+        "outputs": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Action-specific output fields"
+        },
+        "resultingResources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "ARP resource URLs of resources created or modified by this action"
+        },
+        "sideEffectsObserved": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Side effect identifiers that occurred"
+        },
+        "agentId": {
+          "type": "string",
+          "description": "Identifier of the agent that executed the action"
+        },
+        "agentVersion": {
+          "type": "string",
+          "description": "Version of the agent that executed the action"
+        },
+        "errorCode": {
+          "type": "string",
+          "description": "ARP error code if status is 'failed'"
+        },
+        "errorMessage": {
+          "type": "string",
+          "description": "Human-readable error detail if status is 'failed'"
+        },
+        "signature": {
+          "$ref": "#/$defs/signature",
+          "description": "Ed25519 signature. REQUIRED for financial, legal, irreversible, and externally-visible actions."
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": ["alg", "keyId", "signedPayload", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "alg": {
+          "type": "string",
+          "enum": ["Ed25519"],
+          "description": "Signature algorithm"
+        },
+        "keyId": {
+          "type": "string",
+          "format": "uri",
+          "description": "Key identifier URI matching a kid in the origin's arp-keys.json"
+        },
+        "signedPayload": {
+          "type": "string",
+          "description": "Base64url encoding of the canonical UTF-8 JSON payload that was signed. Agents MUST verify this matches expected fields."
+        },
+        "value": {
+          "type": "string",
+          "description": "Base64url encoding of the 64-byte Ed25519 signature"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "arp": "1.1",
+  "id": "arp:health.example:booking:dr-smith-consult",
+  "url": "https://health.example/appointments/book.agent.json",
+  "types": [
+    "healthcare/appointment/v1",
+    "schema/MedicalClinic"
+  ],
+  "properties": {
+    "providerName": "Dr. Sarah Smith",
+    "specialty": "Cardiology",
+    "consultationType": "telehealth",
+    "durationMinutes": 30,
+    "availableSlots": [
+      "2026-07-05T10:00:00Z",
+      "2026-07-05T10:30:00Z",
+      "2026-07-06T14:00:00Z"
+    ],
+    "insuranceAccepted": [
+      "Aetna",
+      "BlueCross",
+      "Medicare"
+    ],
+    "copayEstimated": {
+      "amount": 40.0,
+      "currency": "USD"
+    }
+  },
+  "relationships": [
+    {
+      "type": "hasProviderProfile",
+      "target": "https://health.example/providers/dr-sarah-smith.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    },
+    {
+      "type": "hasPatientRecord",
+      "target": "https://health.example/patient/records/current.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": true
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "appointment.book",
+      "safe": false,
+      "reversible": true,
+      "safetyClass": [
+        "state-changing",
+        "sensitive-data"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://health.example/arp/actions/appointment.book"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "slotTime",
+          "patientId",
+          "reasonForVisit"
+        ],
+        "properties": {
+          "slotTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "patientId": {
+            "type": "string"
+          },
+          "reasonForVisit": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "insuranceId": {
+            "type": "string"
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "string"
+          },
+          "confirmationCode": {
+            "type": "string"
+          },
+          "meetingLink": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "patient.appointments.write",
+          "patient.medical_records.read"
+        ]
+      },
+      "preconditions": [
+        "provider.isAcceptingNewPatients == true"
+      ],
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "appointment.created",
+        "schedule.updated"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.booking.slotUnavailable",
+        "arp.booking.insuranceVerificationFailed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-07-03T18:00:00Z",
+    "validUntil": "2026-07-03T18:15:00Z",
+    "sensitivity": "critical",
+    "retention": "P1D",
+    "signature": {
+      "alg": "Ed25519",
+      "keyId": "https://health.example/.well-known/arp-keys.json#2026-1",
+      "signedPayload": "base64url-canonical-resource-payload-placeholder",
+      "value": "fake-signature-value-telehealth"
+    }
+  },
+  "intent": [
+    "general_interaction"
+  ],
+  "state": {
+    "session_active": true
+  }
+}

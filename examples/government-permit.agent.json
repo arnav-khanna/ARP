@@ -1,0 +1,233 @@
+{
+  "arp": "1.1",
+  "id": "arp:permits.gov.example:permit:building-residential-reno-2026-88123",
+  "url": "https://permits.gov.example/permits/building-residential-reno-2026-88123.agent.json",
+  "types": [
+    "government/permit/v1"
+  ],
+  "properties": {
+    "permitType": "Residential Renovation Permit",
+    "permitNumber": "2026-88123",
+    "status": "draft",
+    "jurisdiction": "City of Exampleville",
+    "applicantName": "Jordan Lee",
+    "propertyAddress": "42 Maple Street, Exampleville, EX 10001",
+    "description": "Interior renovation: kitchen remodel, plumbing and electrical upgrades",
+    "estimatedCost": {
+      "amount": 45000,
+      "currency": "USD"
+    },
+    "applicationFee": {
+      "amount": 350,
+      "currency": "USD"
+    },
+    "requiredInspections": [
+      "electrical",
+      "plumbing",
+      "final"
+    ],
+    "eligibilityRequirements": [
+      "Applicant must be property owner or authorized representative",
+      "Property must not have outstanding code violations",
+      "Work must comply with 2025 International Building Code"
+    ]
+  },
+  "relationships": [
+    {
+      "type": "hasRequiredDocument",
+      "target": "https://permits.gov.example/docs/building-requirements.agent.json",
+      "cardinality": "many",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    },
+    {
+      "type": "hasInspectionSchedule",
+      "target": "https://permits.gov.example/inspections.agent.json",
+      "cardinality": "many",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": true
+      }
+    },
+    {
+      "type": "hasJurisdiction",
+      "target": "https://permits.gov.example/jurisdictions/exampleville.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "permit.saveDraft",
+      "safe": false,
+      "reversible": true,
+      "safetyClass": [
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://permits.gov.example/arp/actions/permit.saveDraft"
+      },
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "estimatedCost": {
+            "type": "number"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "string"
+          },
+          "savedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "permit.write"
+        ]
+      },
+      "requiresHumanConfirmation": false,
+      "sideEffects": [
+        "permit.draftUpdated"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.input.invalid",
+        "arp.precondition.failed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    },
+    {
+      "id": "permit.submit",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "legal",
+        "financial",
+        "irreversible"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://permits.gov.example/arp/actions/permit.submit"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "propertyAddress",
+          "permitType",
+          "applicantCertification",
+          "attachments"
+        ],
+        "properties": {
+          "propertyAddress": {
+            "type": "string",
+            "description": "Address of the property covered by the permit"
+          },
+          "permitType": {
+            "type": "string",
+            "enum": ["new_build", "extension", "renovation"]
+          },
+          "applicantCertification": {
+            "type": "boolean",
+            "const": true,
+            "description": "Applicant certifies all information is accurate and complete"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewDeadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receiptNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "permit.write",
+          "permit.submit"
+        ]
+      },
+      "preconditions": [
+        "permit.status == draft",
+        "permit.allRequiredFieldsPresent"
+      ],
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "permit.submitted",
+        "payment.charged",
+        "notification.sent"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.auth.insufficientScope",
+        "arp.input.invalid",
+        "arp.precondition.failed",
+        "arp.billing.paymentFailed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-07-03T10:00:00Z",
+    "validUntil": "2026-07-03T10:05:00Z",
+    "language": "en-US",
+    "sensitivity": "medium",
+    "retention": "P7Y",
+    "auditRequired": true
+  },
+  "intent": [
+    "general_interaction"
+  ],
+  "state": {
+    "session_active": true
+  }
+}

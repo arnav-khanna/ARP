@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.arp.dev/keys.schema.json",
+  "title": "ARP Key Document",
+  "description": "Schema for /.well-known/arp-keys.json — public key document for ARP receipt and resource signature verification.",
+  "type": "object",
+  "required": ["arp", "origin", "keys"],
+  "additionalProperties": true,
+  "properties": {
+    "arp": {
+      "type": "string",
+      "const": "1.1",
+      "description": "ARP version"
+    },
+    "origin": {
+      "type": "string",
+      "format": "uri",
+      "description": "The origin this key document belongs to"
+    },
+    "keys": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Array of public signing keys",
+      "items": {
+        "$ref": "#/$defs/key"
+      }
+    },
+    "rotationPolicy": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "maxKeyAgeMonths": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "overlapPeriodDays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "revocationEndpoint": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "publishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextRotationDate": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "key": {
+      "type": "object",
+      "required": ["kid", "alg", "use", "status", "activatedAt", "publicKeyJwk", "purposes"],
+      "additionalProperties": true,
+      "properties": {
+        "kid": {
+          "type": "string",
+          "format": "uri",
+          "description": "Globally unique key identifier URI (e.g., https://origin/.well-known/arp-keys.json#2026-1)"
+        },
+        "alg": {
+          "type": "string",
+          "enum": ["Ed25519"],
+          "description": "Signing algorithm. MUST be Ed25519 for ARP v1."
+        },
+        "use": {
+          "type": "string",
+          "enum": ["sig"],
+          "description": "Key usage. MUST be 'sig'."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "retired", "revoked"],
+          "description": "Key lifecycle status"
+        },
+        "activatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when key became active"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp after which key MUST NOT be used for new signatures"
+        },
+        "retiredAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when key was retired"
+        },
+        "revokedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when key was revoked (compromise)"
+        },
+        "publicKeyJwk": {
+          "type": "object",
+          "required": ["kty", "crv", "x"],
+          "properties": {
+            "kty": {
+              "type": "string",
+              "enum": ["OKP"],
+              "description": "Key type. MUST be OKP for Ed25519."
+            },
+            "crv": {
+              "type": "string",
+              "enum": ["Ed25519"],
+              "description": "Curve. MUST be Ed25519."
+            },
+            "x": {
+              "type": "string",
+              "description": "Base64url-encoded 32-byte Ed25519 public key"
+            }
+          }
+        },
+        "purposes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["receipt-signing", "resource-signing"]
+          },
+          "description": "What this key is authorized to sign"
+        }
+      }
+    }
+  }
+}

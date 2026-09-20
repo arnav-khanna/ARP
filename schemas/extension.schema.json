@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.arp.dev/extension.schema.json",
+  "title": "ARP Extension Registry Entry (v1.1)",
+  "type": "object",
+  "required": ["id", "status", "owner", "schemaUrl"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9.-]+/[a-z0-9.-]+/v[0-9]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "experimental", "stable", "deprecated", "withdrawn"]
+    },
+    "owner": {
+      "type": "string"
+    },
+    "schemaUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "specUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "testSuiteUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "compatibleWith": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "securityReview": {
+      "type": "string"
+    },
+    "privacyReview": {
+      "type": "string"
+    }
+  }
+}

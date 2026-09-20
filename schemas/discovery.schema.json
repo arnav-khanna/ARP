@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.arp.dev/discovery.schema.json",
+  "title": "ARP Discovery Document (v1.1)",
+  "type": "object",
+  "required": ["arp", "origin", "versions"],
+  "additionalProperties": true,
+  "properties": {
+    "arp": {
+      "type": "string",
+      "const": "1.1"
+    },
+    "origin": {
+      "type": "string",
+      "format": "uri"
+    },
+    "versions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "const": "1.1"
+      }
+    },
+    "siteCapabilities": {
+      "type": "array",
+      "description": "List of global capabilities, protocols, or intents supported by the site.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "representations": {
+      "type": "object",
+      "properties": {
+        "defaultMediaType": {
+          "type": "string"
+        },
+        "contentNegotiation": {
+          "type": "boolean"
+        },
+        "urlTemplates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "extensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "schemaUrl", "status"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "schemaUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "specUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "description": "Details about authentication flows and context (e.g., logged_in, account types).",
+      "additionalProperties": true
+    },
+    "governance": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": true
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "search": {
+      "$ref": "action.schema.json"
+    },
+    "keys": {
+      "type": "string",
+      "format": "uri"
+    }
+  }
+}

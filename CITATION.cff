@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: "Agent Resource Protocol (ARP)"
+message: "If you use this research project, please cite it using the metadata in this file."
+type: software
+authors:
+  - family-names: Khanna
+    given-names: Arnav
+repository-code: "https://github.com/arnav-khanna/ARP"
+abstract: "Agent Resource Protocol (ARP) is a proposed website-origin agent interaction protocol that represents the Web as resources, relationships, actions, and policies."
+keywords:
+  - agents
+  - web standards
+  - protocol
+  - artificial intelligence
+  - semantic web
+  - web automation
+license: Apache-2.0
+version: "1.1.0"
+date-released: "2026-07-04"

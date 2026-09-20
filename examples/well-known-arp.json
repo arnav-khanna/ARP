@@ -1,0 +1,86 @@
+{
+  "arp": "1.1",
+  "origin": "https://shop.example",
+  "versions": ["1.1"],
+  "siteCapabilities": [
+    "arp/1.1",
+    "ecommerce/product/v1",
+    "ecommerce/cart/v1",
+    "ecommerce/order/v1",
+    "safe-query-actions/v1"
+  ],
+  "representations": {
+    "defaultMediaType": "application/arp+json",
+    "contentNegotiation": true,
+    "urlTemplates": [
+      "{url}.agent.json",
+      "/.well-known/arp/resources{path}.json"
+    ]
+  },
+  "resources": {
+    "catalog": "https://shop.example/catalog.agent.json",
+    "cart": "https://shop.example/cart.agent.json"
+  },
+  "search": {
+    "id": "catalog.search",
+    "safe": true,
+    "idempotent": true,
+    "reversible": true,
+    "safetyClass": ["safe-read"],
+    "binding": {
+      "method": "POST",
+      "href": "https://shop.example/arp/search/catalog"
+    },
+    "inputs": { "type": "object" },
+    "outputs": { "type": "object" },
+    "authorization": { "required": false },
+    "requiresHumanConfirmation": false,
+    "sideEffects": []
+  },
+  "authentication": {
+    "methods": ["Bearer", "OAuth2"],
+    "oauth2": {
+      "authorizationEndpoint": "https://shop.example/oauth/authorize",
+      "tokenEndpoint": "https://shop.example/oauth/token",
+      "scopes": {
+        "cart.read": "Read cart contents",
+        "cart.write": "Add or remove cart items",
+        "order.create": "Place orders",
+        "order.read": "Read order history",
+        "account.read": "Read account information"
+      }
+    }
+  },
+  "keys": "https://shop.example/.well-known/arp-keys.json",
+  "extensions": [
+    {
+      "id": "ecommerce/product/v1",
+      "schemaUrl": "https://schemas.arp.dev/ecommerce/product/v1/schema.json",
+      "specUrl": "https://schemas.arp.dev/ecommerce/product/v1/spec.md",
+      "status": "draft"
+    },
+    {
+      "id": "ecommerce/cart/v1",
+      "schemaUrl": "https://schemas.arp.dev/ecommerce/cart/v1/schema.json",
+      "specUrl": "https://schemas.arp.dev/ecommerce/cart/v1/spec.md",
+      "status": "draft"
+    }
+  ],
+  "governance": {
+    "policy": "https://shop.example/.well-known/arp-policy.json",
+    "rateLimits": [
+      {
+        "tier": "anonymous",
+        "limit": 200,
+        "period": "PT1M"
+      },
+      {
+        "tier": "verified-agent",
+        "limit": 3000,
+        "period": "PT1M"
+      }
+    ],
+    "trainingUse": "prohibited-without-license",
+    "contact": "mailto:arp-policy@shop.example"
+  }
+}

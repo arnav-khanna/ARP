@@ -1,0 +1,184 @@
+{
+  "arp": "1.1",
+  "id": "arp:logistics.example:shipment:1Z9999999999999999",
+  "url": "https://logistics.example/tracking/1Z9999999999999999.agent.json",
+  "types": [
+    "logistics/shipment/v1",
+    "schema/ParcelDelivery"
+  ],
+  "properties": {
+    "trackingNumber": "1Z9999999999999999",
+    "carrier": "Astra Logistics",
+    "status": "in_transit",
+    "estimatedDeliveryDate": "2026-07-06T18:00:00Z",
+    "origin": {
+      "city": "Seattle",
+      "state": "WA",
+      "country": "US"
+    },
+    "destination": {
+      "city": "Austin",
+      "state": "TX",
+      "country": "US"
+    },
+    "weight": {
+      "value": 4.5,
+      "unit": "KGM"
+    },
+    "history": [
+      {
+        "status": "picked_up",
+        "location": "Seattle, WA",
+        "timestamp": "2026-07-03T09:15:00Z"
+      },
+      {
+        "status": "departed_facility",
+        "location": "Seattle, WA",
+        "timestamp": "2026-07-03T20:45:00Z"
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "type": "hasDeliveryProof",
+      "target": "https://logistics.example/tracking/1Z9999999999999999/pod.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": true
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "shipment.reroute",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "state-changing",
+        "financial"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://logistics.example/arp/actions/shipment.reroute"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "newAddressId"
+        ],
+        "properties": {
+          "newAddressId": {
+            "type": "string"
+          },
+          "deliveryInstructions": {
+            "type": "string",
+            "maxLength": 100
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "confirmationId": {
+            "type": "string"
+          },
+          "feeApplied": {
+            "type": "number"
+          },
+          "newEstimatedDeliveryDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "shipment.manage"
+        ]
+      },
+      "preconditions": [
+        "shipment.status != delivered",
+        "shipment.status != out_for_delivery"
+      ],
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "shipment.destinationModified",
+        "billing.charged"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.logistics.rerouteNotAllowed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    },
+    {
+      "id": "shipment.holdAtLocation",
+      "safe": false,
+      "reversible": true,
+      "safetyClass": [
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://logistics.example/arp/actions/shipment.hold"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "locationId"
+        ],
+        "properties": {
+          "locationId": {
+            "type": "string"
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "confirmationId": {
+            "type": "string"
+          },
+          "pickupAddress": {
+            "type": "string"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "shipment.manage"
+        ]
+      },
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "shipment.destinationModified"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.logistics.holdNotAllowed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-07-03T18:00:00Z",
+    "validUntil": "2026-07-03T18:30:00Z",
+    "sensitivity": "low",
+    "retention": "P90D"
+  },
+  "intent": [
+    "general_interaction"
+  ],
+  "state": {
+    "session_active": true
+  }
+}

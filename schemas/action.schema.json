@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.arp.dev/action.schema.json",
+  "title": "ARP Action (v1.1)",
+  "type": "object",
+  "required": ["id", "safe", "binding", "inputs", "outputs", "authorization", "sideEffects"],
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "safe": { "const": true }
+        },
+        "required": ["safe"]
+      },
+      "then": {
+        "required": ["safetyClass"],
+        "properties": {
+          "safetyClass": {
+            "contains": { "const": "safe-read" }
+          },
+          "sideEffects": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "safetyClass": {
+            "contains": {
+              "enum": ["externally-visible", "financial", "legal", "sensitive-data", "irreversible"]
+            }
+          }
+        },
+        "required": ["safetyClass"]
+      },
+      "then": {
+        "properties": {
+          "requiresHumanConfirmation": { "const": true }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "safe": {
+      "type": "boolean"
+    },
+    "idempotent": {
+      "type": "boolean"
+    },
+    "reversible": {
+      "type": "boolean"
+    },
+    "safetyClass": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "safe-read",
+          "state-changing",
+          "externally-visible",
+          "financial",
+          "legal",
+          "sensitive-data",
+          "irreversible"
+        ]
+      }
+    },
+    "cost": {
+      "type": "object",
+      "description": "Expected resource cost of executing the action to allow agents to plan.",
+      "additionalProperties": true
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Agent capabilities or explicit permissions required to execute without human intervention.",
+      "additionalProperties": true
+    },
+    "binding": {
+      "type": "object",
+      "required": ["href"],
+      "additionalProperties": true,
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        }
+      }
+    },
+    "inputs": {
+      "type": "object"
+    },
+    "outputs": {
+      "type": "object"
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "preconditions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "additionalProperties": true
+          }
+        ]
+      }
+    },
+    "sideEffects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "expectedOutcomes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "requiresHumanConfirmation": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

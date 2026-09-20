@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.arp.dev/governance.schema.json",
+  "title": "ARP Governance Policy (v1.1)",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "policyVersion": {
+      "type": "string"
+    },
+    "rateLimits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["limit", "period"],
+        "additionalProperties": true,
+        "properties": {
+          "tier": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "period": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "trainingUse": {
+      "type": "string"
+    },
+    "auditRequiredFor": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "contact": {
+      "type": "string"
+    },
+    "revocation": {
+      "type": "string",
+      "format": "uri"
+    },
+    "reputationRegistries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    }
+  }
+}

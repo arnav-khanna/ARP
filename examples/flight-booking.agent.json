@@ -1,0 +1,176 @@
+{
+  "arp": "1.1",
+  "id": "arp:travel.example:flight:DL123-20260815",
+  "url": "https://travel.example/flights/DL123-20260815.agent.json",
+  "types": [
+    "travel/flight/v1",
+    "schema/Flight"
+  ],
+  "properties": {
+    "flightNumber": "DL123",
+    "airline": "Astra Airlines",
+    "departure": {
+      "airportCode": "JFK",
+      "terminal": "4",
+      "time": "2026-08-15T08:00:00Z"
+    },
+    "arrival": {
+      "airportCode": "LHR",
+      "terminal": "3",
+      "time": "2026-08-15T20:00:00Z"
+    },
+    "status": "scheduled",
+    "aircraft": "Boeing 777-300ER",
+    "pricingOptions": [
+      {
+        "cabin": "economy",
+        "fareClass": "basic",
+        "price": {
+          "amount": 450.0,
+          "currency": "USD"
+        },
+        "seatsAvailable": 12
+      },
+      {
+        "cabin": "business",
+        "fareClass": "flexible",
+        "price": {
+          "amount": 2100.0,
+          "currency": "USD"
+        },
+        "seatsAvailable": 3
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "type": "hasRoute",
+      "target": "https://travel.example/routes/JFK-LHR.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    },
+    {
+      "type": "hasSeatMap",
+      "target": "https://travel.example/flights/DL123-20260815/seatmap.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "flight.book",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "financial",
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://travel.example/arp/actions/flight.book"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "cabin",
+          "fareClass",
+          "passengers"
+        ],
+        "properties": {
+          "cabin": {
+            "type": "string"
+          },
+          "fareClass": {
+            "type": "string"
+          },
+          "passengers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "firstName",
+                "lastName",
+                "dob"
+              ],
+              "properties": {
+                "firstName": {
+                  "type": "string"
+                },
+                "lastName": {
+                  "type": "string"
+                },
+                "dob": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "passportNumber": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "bookingReference": {
+            "type": "string"
+          },
+          "totalPrice": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "travel.booking.write"
+        ]
+      },
+      "preconditions": [
+        "flight.seatsAvailable >= passengers.length"
+      ],
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "booking.created",
+        "inventory.decreased"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.inventory.soldOut"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-07-03T18:00:00Z",
+    "validUntil": "2026-07-03T18:05:00Z",
+    "sensitivity": "medium",
+    "retention": "P7D",
+    "signature": {
+      "alg": "Ed25519",
+      "keyId": "https://travel.example/.well-known/arp-keys.json#2026-1",
+      "signedPayload": "base64url-canonical-resource-payload-placeholder",
+      "value": "fake-signature-value-flight"
+    }
+  },
+  "intent": [
+    "general_interaction"
+  ],
+  "state": {
+    "session_active": true
+  }
+}

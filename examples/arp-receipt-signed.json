@@ -1,0 +1,35 @@
+{
+  "receipt": {
+    "id": "arp-receipt-01HWWWEXAMPLERECEIPTID",
+    "version": "1.0",
+    "action": "order.create",
+    "resource": "arp:shop.example:cart:user-cart-abc123",
+    "origin": "https://shop.example",
+    "executedAt": "2026-07-03T10:30:00Z",
+    "requestHash": "sha256-base64url-HASH_OF_REQUEST_BODY",
+    "nonce": "a1b2c3d4e5f6",
+    "status": "succeeded",
+    "inputs": {
+      "variantId": "rain-jacket-blue-m",
+      "quantity": 1,
+      "shippingAddressId": "addr-xyz"
+    },
+    "resultingResources": [
+      "https://shop.example/orders/order-789.agent.json"
+    ],
+    "sideEffectsObserved": [
+      "cart.cleared",
+      "order.created",
+      "email.confirmationSent"
+    ],
+    "agentId": "openai-gpt-agent-v4",
+    "agentVersion": "4.1.2",
+    "signature": {
+      "alg": "Ed25519",
+      "keyId": "https://shop.example/.well-known/arp-keys.json#2026-1",
+      "signedPayload": "base64url({\"id\":\"arp-receipt-01HWWWEXAMPLERECEIPTID\",\"action\":\"order.create\",\"executedAt\":\"2026-07-03T10:30:00Z\",\"nonce\":\"a1b2c3d4e5f6\",\"requestHash\":\"sha256-base64url-HASH_OF_REQUEST_BODY\",\"status\":\"succeeded\"})",
+      "value": "base64url-Ed25519-SIGNATURE-VALUE"
+    }
+  },
+  "_comment": "To verify this receipt: (1) fetch keyId URL, (2) find key with matching kid, (3) base64url-decode signedPayload, (4) verify Ed25519 signature over that canonical JSON using the public key, (5) check nonce has not been seen before (replay protection), (6) check executedAt is within acceptable clock skew."
+}

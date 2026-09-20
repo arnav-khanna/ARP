@@ -1,0 +1,328 @@
+{
+  "arp": "1.1",
+  "id": "arp:app.example:subscription:user-acct-9182",
+  "url": "https://app.example/account/subscription.agent.json",
+  "types": [
+    "saas/subscription/v1"
+  ],
+  "properties": {
+    "plan": "Professional",
+    "planId": "pro-monthly",
+    "status": "active",
+    "seats": 5,
+    "seatsUsed": 3,
+    "billingCycle": "monthly",
+    "billingAmount": {
+      "amount": 79.0,
+      "currency": "USD"
+    },
+    "nextBillingDate": "2026-08-01",
+    "trialActive": false,
+    "features": [
+      "unlimited-projects",
+      "team-collaboration",
+      "api-access",
+      "priority-support"
+    ],
+    "cancelAtPeriodEnd": false
+  },
+  "relationships": [
+    {
+      "type": "hasOwner",
+      "target": "https://app.example/account.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": true
+      }
+    },
+    {
+      "type": "hasAvailablePlan",
+      "target": "https://app.example/plans.agent.json",
+      "cardinality": "many",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    },
+    {
+      "type": "hasBillingHistory",
+      "target": "https://app.example/account/invoices.agent.json",
+      "cardinality": "many",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": true
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "subscription.upgrade",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "financial",
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://app.example/arp/actions/subscription.upgrade"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "targetPlanId"
+        ],
+        "properties": {
+          "targetPlanId": {
+            "type": "string"
+          },
+          "billingCycle": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "annual"
+            ]
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "newPlanId": {
+            "type": "string"
+          },
+          "effectiveDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "proratedAmount": {
+            "type": "number"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "subscription.write",
+          "billing.write"
+        ]
+      },
+      "preconditions": [
+        "subscription.status == active"
+      ],
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "subscription.modified",
+        "billing.charged"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.auth.insufficientScope",
+        "arp.precondition.failed",
+        "arp.billing.paymentFailed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    },
+    {
+      "id": "subscription.downgrade",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "financial",
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://app.example/arp/actions/subscription.downgrade"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "targetPlanId"
+        ],
+        "properties": {
+          "targetPlanId": {
+            "type": "string"
+          },
+          "effectiveImmediately": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "newPlanId": {
+            "type": "string"
+          },
+          "effectiveDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lostFeatures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "subscription.write"
+        ]
+      },
+      "preconditions": [
+        "subscription.status == active"
+      ],
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "subscription.modified"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.auth.insufficientScope",
+        "arp.precondition.failed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    },
+    {
+      "id": "subscription.cancel",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "financial",
+        "state-changing",
+        "irreversible"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://app.example/arp/actions/subscription.cancel"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "cancelAtPeriodEnd"
+        ],
+        "properties": {
+          "cancelAtPeriodEnd": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "accessUntil": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "subscription.write",
+          "billing.write"
+        ]
+      },
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "subscription.cancelled"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.auth.insufficientScope",
+        "arp.precondition.failed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    },
+    {
+      "id": "subscription.addSeat",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "financial",
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://app.example/arp/actions/subscription.addSeat"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "quantity"
+        ],
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "totalSeats": {
+            "type": "integer"
+          },
+          "proratedAmount": {
+            "type": "number"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "subscription.write",
+          "billing.write"
+        ]
+      },
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "subscription.modified",
+        "billing.charged"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.auth.insufficientScope",
+        "arp.billing.paymentFailed"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-07-03T10:00:00Z",
+    "validUntil": "2026-07-03T10:05:00Z",
+    "sensitivity": "high",
+    "retention": "P30D"
+  },
+  "intent": [
+    "general_interaction"
+  ],
+  "state": {
+    "session_active": true
+  }
+}

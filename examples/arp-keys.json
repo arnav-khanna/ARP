@@ -1,0 +1,45 @@
+{
+  "comment": "Public key document for ARP receipt signature verification. Published at /.well-known/arp-keys.json",
+  "arp": "1.1",
+  "origin": "https://shop.example",
+  "keys": [
+    {
+      "kid": "https://shop.example/.well-known/arp-keys.json#2026-1",
+      "alg": "Ed25519",
+      "use": "sig",
+      "status": "active",
+      "activatedAt": "2026-01-01T00:00:00Z",
+      "expiresAt": "2027-01-01T00:00:00Z",
+      "publicKeyJwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo"
+      },
+      "purposes": ["receipt-signing", "resource-signing"]
+    },
+    {
+      "kid": "https://shop.example/.well-known/arp-keys.json#2025-1",
+      "alg": "Ed25519",
+      "use": "sig",
+      "status": "retired",
+      "activatedAt": "2025-01-01T00:00:00Z",
+      "retiredAt": "2026-01-01T00:00:00Z",
+      "publicKeyJwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      },
+      "purposes": ["receipt-signing"],
+      "comment": "Retired key kept for historical receipt verification. Do not use for new signatures."
+    }
+  ],
+  "rotationPolicy": {
+    "maxKeyAgeMonths": 12,
+    "overlapPeriodDays": 30,
+    "revocationEndpoint": "https://shop.example/.well-known/arp-keys-revocation.json"
+  },
+  "metadata": {
+    "publishedAt": "2026-07-03T00:00:00Z",
+    "nextRotationDate": "2026-12-01"
+  }
+}

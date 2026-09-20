@@ -1,0 +1,212 @@
+{
+  "arp": "1.1",
+  "id": "arp:bank.example:account:checking-9912",
+  "url": "https://bank.example/account/checking-9912.agent.json",
+  "types": [
+    "banking/account/v1",
+    "schema/BankAccount"
+  ],
+  "properties": {
+    "accountType": "checking",
+    "accountName": "Everyday Checking",
+    "balance": {
+      "amount": 4250.75,
+      "currency": "USD"
+    },
+    "availableBalance": {
+      "amount": 4200.75,
+      "currency": "USD"
+    },
+    "status": "active",
+    "routingNumberLast4": "1234",
+    "accountNumberLast4": "9912"
+  },
+  "relationships": [
+    {
+      "type": "hasTransactionHistory",
+      "target": "https://bank.example/account/checking-9912/transactions.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": true
+      }
+    },
+    {
+      "type": "hasPayeeList",
+      "target": "https://bank.example/user/payees.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": true
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "transfer.internal",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "financial",
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://bank.example/arp/actions/transfer/internal"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "toAccountId",
+          "amount"
+        ],
+        "properties": {
+          "toAccountId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 0.01
+          },
+          "memo": {
+            "type": "string",
+            "maxLength": 140
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "bank.transfer.internal"
+        ]
+      },
+      "preconditions": [
+        "account.availableBalance >= amount"
+      ],
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "balance.decreased",
+        "transaction.created"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.banking.insufficientFunds"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    },
+    {
+      "id": "transfer.wire",
+      "safe": false,
+      "reversible": false,
+      "safetyClass": [
+        "financial",
+        "state-changing",
+        "irreversible"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://bank.example/arp/actions/transfer/wire"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "payeeId",
+          "amount",
+          "mfaToken"
+        ],
+        "properties": {
+          "payeeId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 100.0
+          },
+          "memo": {
+            "type": "string",
+            "maxLength": 140
+          },
+          "mfaToken": {
+            "type": "string"
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "wireId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "estimatedDelivery": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "bank.transfer.wire"
+        ]
+      },
+      "preconditions": [
+        "account.availableBalance >= amount + wireFee",
+        "payee.status == approved"
+      ],
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "balance.decreased",
+        "wire.initiated"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.banking.insufficientFunds",
+        "arp.banking.mfaRequired",
+        "arp.banking.mfaInvalid"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-07-03T18:00:00Z",
+    "validUntil": "2026-07-03T18:05:00Z",
+    "sensitivity": "critical",
+    "retention": "P0D",
+    "signature": {
+      "alg": "Ed25519",
+      "keyId": "https://bank.example/.well-known/arp-keys.json#2026-1",
+      "signedPayload": "base64url-canonical-resource-payload-placeholder",
+      "value": "fake-signature-value-banking"
+    }
+  },
+  "intent": [
+    "general_interaction"
+  ],
+  "state": {
+    "session_active": true
+  }
+}

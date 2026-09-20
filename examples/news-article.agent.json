@@ -1,0 +1,190 @@
+{
+  "arp": "1.1",
+  "id": "arp:news.example:article:climate-tipping-points-2026",
+  "url": "https://news.example/articles/climate-tipping-points-2026",
+  "types": [
+    "news/article/v1"
+  ],
+  "properties": {
+    "headline": "Scientists Identify Three New Climate Tipping Points",
+    "subheadline": "A landmark study published in Nature warns that Arctic permafrost, Amazon dieback, and Greenland ice sheet thresholds may be closer than previously modelled.",
+    "byline": {
+      "author": "Dr. Sarah Chen",
+      "authorUrl": "https://news.example/authors/sarah-chen.agent.json"
+    },
+    "publishedAt": "2026-07-01T09:00:00Z",
+    "updatedAt": "2026-07-01T14:30:00Z",
+    "wordCount": 1842,
+    "readingTimeMinutes": 7,
+    "language": "en-US",
+    "summary": "A new study models three previously underestimated climate feedback loops. The findings have implications for the 1.5\u00c2\u00b0C target set by the Paris Agreement.",
+    "topics": [
+      "climate",
+      "science",
+      "policy",
+      "environment"
+    ],
+    "premium": false,
+    "license": "CC-BY-4.0"
+  },
+  "relationships": [
+    {
+      "type": "hasAuthor",
+      "target": "https://news.example/authors/sarah-chen.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    },
+    {
+      "type": "hasRelatedArticle",
+      "target": "https://news.example/articles/paris-agreement-review-2026.agent.json",
+      "cardinality": "many",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    },
+    {
+      "type": "hasSection",
+      "target": "https://news.example/sections/climate.agent.json",
+      "cardinality": "one",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    },
+    {
+      "type": "hasCitation",
+      "target": "https://doi.org/10.1038/s41586-026-08234-1",
+      "cardinality": "many",
+      "traversal": {
+        "allowed": true,
+        "requiresAuthentication": false
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "article.share",
+      "safe": false,
+      "reversible": true,
+      "safetyClass": [
+        "externally-visible"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://news.example/arp/actions/article.share"
+      },
+      "inputs": {
+        "type": "object",
+        "required": [
+          "platform"
+        ],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "email",
+              "clipboard",
+              "link"
+            ]
+          },
+          "recipientEmail": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "shareUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "authorization": {
+        "required": false
+      },
+      "requiresHumanConfirmation": true,
+      "sideEffects": [
+        "share.logged"
+      ],
+      "errors": [
+        "arp.input.invalid",
+        "arp.auth.insufficientScope"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    },
+    {
+      "id": "article.bookmark",
+      "safe": false,
+      "reversible": true,
+      "safetyClass": [
+        "state-changing"
+      ],
+      "binding": {
+        "method": "POST",
+        "href": "https://news.example/arp/actions/article.bookmark"
+      },
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "collectionId": {
+            "type": "string"
+          }
+        }
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "bookmarkId": {
+            "type": "string"
+          }
+        }
+      },
+      "authorization": {
+        "required": true,
+        "scopes": [
+          "bookmarks.write"
+        ]
+      },
+      "requiresHumanConfirmation": false,
+      "sideEffects": [
+        "bookmarks.modified"
+      ],
+      "errors": [
+        "arp.auth.required",
+        "arp.auth.insufficientScope"
+      ],
+      "cost": {
+        "api_calls": 1,
+        "estimated_time_ms": 500
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-07-01T09:05:00Z",
+    "validUntil": "2026-07-02T09:05:00Z",
+    "language": "en-US",
+    "contentHash": "sha256-base64url-abc123",
+    "signature": {
+      "alg": "Ed25519",
+      "keyId": "https://news.example/.well-known/arp-keys.json#2026-1",
+      "signedPayload": "base64url-canonical-resource-payload-placeholder",
+      "value": "base64url-signature-placeholder"
+    }
+  },
+  "intent": [
+    "general_interaction"
+  ],
+  "state": {
+    "session_active": true
+  }
+}
